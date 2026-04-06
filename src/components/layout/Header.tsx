@@ -51,22 +51,6 @@ export default function Header() {
 
         {/* Action Icons */}
         <div className="flex items-center gap-4 text-slate-600 dark:text-slate-400">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="hover:text-blue-600 transition-colors h-auto w-auto p-2"
-          >
-            <span className="material-symbols-outlined">Cart</span>
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            className="hover:text-blue-600 transition-colors h-auto w-auto p-2"
-          >
-            <span className="material-symbols-outlined">favorite</span>
-          </Button>
-
           {isLoggedIn ? (
             /* Logged-in: show avatar / name + logout */
             <div className="flex items-center gap-3">
@@ -78,6 +62,13 @@ export default function Header() {
                   {user?.name ?? "Account"}
                 </span>
               </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:text-blue-600 transition-colors h-auto w-auto p-2"
+              >
+                <span className="material-symbols-outlined">Cart</span>
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
@@ -103,4 +94,3 @@ export default function Header() {
     </nav>
   );
 }
-

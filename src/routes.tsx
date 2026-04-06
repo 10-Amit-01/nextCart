@@ -8,15 +8,16 @@ import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import LoginPage from "./pages/LoginPage";
 import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const routes = createBrowserRouter([
   {
     path: "/",
-    element: <MainLayout />, 
+    element: <MainLayout />,
     errorElement: <NotFound />,
     children: [
       {
-        index: true, 
+        index: true,
         element: <HomePage />,
       },
       {
@@ -24,21 +25,26 @@ const routes = createBrowserRouter([
         element: <ShopPage />,
       },
       {
-        path: "product/:id", 
+        path: "product/:id",
         element: <ProductDetail />,
       },
       {
-        path: "cart",
-        element: <CartPage />,
-      },
-      {
-        path: "checkout",
-        element: <CheckoutPage />,
+        element: <ProtectedRoute />,
+        children: [
+          {
+            path: "cart",
+            element: <CartPage />,
+          },
+          {
+            path: "checkout",
+            element: <CheckoutPage />,
+          },
+        ],
       },
     ],
   },
   {
-    path: "/login", 
+    path: "/login",
     element: <LoginPage />,
   },
 ]);

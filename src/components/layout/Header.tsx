@@ -4,10 +4,13 @@ import { Button } from "@/components/ui/button";
 import SearchBar from "../SearchBar";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logout } from "@/store/slices/authSlice";
+import { toggleTheme } from "@/store/slices/themeSlice";
+import { Moon, Sun } from "lucide-react";
 
 export default function Header() {
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
   const user = useAppSelector((state) => state.auth.user);
+  const theme = useAppSelector((state) => state.theme.theme);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -51,6 +54,16 @@ export default function Header() {
 
         {/* Action Icons */}
         <div className="flex items-center gap-4 text-slate-600 dark:text-slate-400">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors h-auto w-auto p-2"
+            onClick={() => dispatch(toggleTheme())}
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </Button>
+
           {isLoggedIn ? (
             /* Logged-in: show avatar / name + logout */
             <div className="flex items-center gap-3">

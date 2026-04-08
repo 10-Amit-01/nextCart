@@ -9,7 +9,7 @@ export default function SearchBar() {
         <Search/>
       </span>
       <Input
-        className="bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 w-48 h-auto p-1"
+        className="bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 w-48 h-auto p-1 dark:bg-slate-800"
         placeholder="Search devices..."
         type="text"
       />

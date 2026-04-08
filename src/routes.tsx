@@ -6,9 +6,10 @@ import ShopPage from "./pages/ShopPage";
 import ProductDetail from "./pages/ProductDetail";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
-import LoginPage from "./pages/LoginPage";
+import LoginPage from "./pages/auth/LoginPage";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { SignupForm } from "./pages/auth/SignUp";
 
 const routes = createBrowserRouter([
   {
@@ -46,6 +47,10 @@ const routes = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
+  },
+  {
+    path: "/signup",
+    element: <SignupForm />,
   },
 ]);
 

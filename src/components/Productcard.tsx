@@ -16,31 +16,47 @@ export default function ProductCard({ product, className = "" }) {
     setQty(qty - 1);
   }
 
+  const discountPct = product.discountPrice
+    ? Math.round(((product.price - product.discountPrice) / product.price) * 100)
+    : null;
+
   return (
     <div
       className={`
-        group bg-white dark:bg-slate-800 rounded-xl p-4 
-        transition-all hover:shadow-xl hover:shadow-slate-200/50 
-        dark:hover:shadow-slate-950/50 
-        border border-transparent 
+        group bg-white dark:bg-slate-800 rounded-xl p-4
+        transition-all hover:shadow-xl hover:shadow-slate-200/50
+        dark:hover:shadow-slate-950/50
+        border border-transparent
         hover:border-slate-200 dark:hover:border-slate-700
+        flex flex-col
         ${className}
       `}
     >
       {/* Product Image */}
-      <div className="aspect-square rounded-lg bg-slate-100 dark:bg-slate-700 overflow-hidden mb-6 relative">
+      <div className="aspect-square rounded-lg bg-slate-100 dark:bg-slate-700 overflow-hidden mb-4 relative">
         <img
-          alt={product.name}
+          alt={product.images?.[0]?.alt ?? product.title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          src={product.image}
+          src={product.images?.[0]?.url}
+          onError={(e) => {
+            (e.target as HTMLImageElement).src =
+              "https://placehold.co/400x400?text=No+Image";
+          }}
         />
 
-        {/* Badge */}
-        {product.badge && (
-          <span className="absolute top-3 left-3 bg-white dark:bg-slate-900 px-2 py-1 rounded text-[10px] font-bold tracking-widest uppercase shadow-sm text-slate-900 dark:text-slate-50">
-            {product.badge}
-          </span>
-        )}
+        {/* Badges */}
+        <div className="absolute top-3 left-3 flex flex-col gap-1">
+          {discountPct && (
+            <span className="bg-red-500 text-white px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase shadow-sm">
+              -{discountPct}%
+            </span>
+          )}
+          {!discountPct && product.tags?.[0] && (
+            <span className="bg-white dark:bg-slate-900 px-2 py-0.5 rounded text-[10px] font-bold tracking-widest uppercase shadow-sm text-slate-900 dark:text-slate-50">
+              {product.tags[0]}
+            </span>
+          )}
+        </div>
 
         {/* Wishlist Button */}
         <Button
@@ -48,9 +64,9 @@ export default function ProductCard({ product, className = "" }) {
           size="icon"
           onClick={() => setIsWishlisted(!isWishlisted)}
           className={`
-            absolute top-3 right-3 
-            w-8 h-8 rounded-full 
-            bg-white/90 dark:bg-slate-900/90 
+            absolute top-3 right-3
+            w-8 h-8 rounded-full
+            bg-white/90 dark:bg-slate-900/90
             backdrop-blur-sm
             opacity-0 group-hover:opacity-100
             transition-all duration-300
@@ -58,10 +74,7 @@ export default function ProductCard({ product, className = "" }) {
             ${isWishlisted ? "text-red-500" : "text-slate-400"}
           `}
         >
-          <Heart
-            className="w-4 h-4"
-            fill={isWishlisted ? "currentColor" : "none"}
-          />
+          <Heart className="w-4 h-4" fill={isWishlisted ? "currentColor" : "none"} />
         </Button>
 
         {/* Quick View on Hover */}
@@ -77,18 +90,25 @@ export default function ProductCard({ product, className = "" }) {
       </div>
 
       {/* Product Info */}
-      <div className="space-y-1">
-        <h3 className="font-semibold text-slate-900 dark:text-slate-50 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-          {product.name}
+      <div className="flex flex-col flex-1 space-y-1.5">
+        {/* Brand & Category */}
+        <p className="text-[11px] text-slate-400 dark:text-slate-500 uppercase tracking-wider font-medium">
+          {product.brand} &middot; {product.category}
+        </p>
+
+        {/* Title */}
+        <h3 className="font-semibold text-slate-900 dark:text-slate-50 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug">
+          {product.title}
         </h3>
 
-        <p className="text-slate-600 dark:text-slate-400 text-sm">
+        {/* Description */}
+        <p className="text-slate-500 dark:text-slate-400 text-xs line-clamp-2 flex-1">
           {product.description}
         </p>
 
-        {/* Rating (if available) */}
-        {product.rating && (
-          <div className="flex items-center gap-1">
+        {/* Rating */}
+        {product.rating > 0 && (
+          <div className="flex items-center gap-1.5">
             <div className="flex">
               {[...Array(5)].map((_, i) => (
                 <span
@@ -104,68 +124,92 @@ export default function ProductCard({ product, className = "" }) {
               ))}
             </div>
             <span className="text-xs text-slate-500 dark:text-slate-400">
-              ({product.reviews || 0})
+              {product.rating.toFixed(1)}{" "}
+              <span className="text-slate-400">({product.numReviews?.toLocaleString()})</span>
             </span>
+          </div>
+        )}
+
+        {/* Color swatches */}
+        {product.attributes?.color?.length > 0 && (
+          <div className="flex items-center gap-1.5 pt-0.5">
+            {product.attributes.color.slice(0, 6).map((color: string) => (
+              <span
+                key={color}
+                title={color}
+                className="w-3.5 h-3.5 rounded-full border border-slate-200 dark:border-slate-600 shadow-sm inline-block"
+                style={{ backgroundColor: color.toLowerCase() }}
+              />
+            ))}
+            {product.attributes.color.length > 6 && (
+              <span className="text-[10px] text-slate-400">
+                +{product.attributes.color.length - 6}
+              </span>
+            )}
           </div>
         )}
       </div>
 
-      {/* Price and Add to Cart */}
+      {/* Price & Cart */}
       <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
         <div>
-          {product.originalPrice && (
-            <span className="text-sm text-slate-400 line-through mr-2">
-              ${product.originalPrice.toFixed(2)}
+          {product.discountPrice ? (
+            <>
+              <span className="text-xs text-slate-400 line-through mr-1.5">
+                ${product.price.toFixed(2)}
+              </span>
+              <span className="text-base font-bold text-red-500">
+                ${product.discountPrice.toFixed(2)}
+              </span>
+            </>
+          ) : (
+            <span className="text-base font-bold text-slate-900 dark:text-slate-50">
+              ${product.price.toFixed(2)}
             </span>
           )}
-          <span className="text-lg font-bold text-slate-900 dark:text-slate-50">
-            ${product.price.toFixed(2)}
-          </span>
         </div>
 
-        <div className="flex justify-center items-center gap-4">
-          <div>
-            <Button
-              onClick={increaseQty}
-              size="icon-xs"
-              className="p-2 rounded-lg bg-white text-slate-900 hover:bg-blue-700 transition-all hover:scale-110"
+        <div className="flex items-center gap-2">
+          <div className="flex items-center border border-slate-200 dark:border-slate-600 rounded-lg overflow-hidden">
+            <button
+              onClick={decreaseQty}
+              className="px-2 py-1.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm"
             >
-              <Plus />
-            </Button>
-            <span className="text-slate-900 dark:text-slate-50 mx-2 ">
+              <Minus className="w-3 h-3" />
+            </button>
+            <span className="px-2 text-sm font-medium text-slate-900 dark:text-slate-50 min-w-[20px] text-center">
               {qty}
             </span>
-            <Button
-              onClick={decreaseQty}
-              size="icon-xs"
-              className="p-2 rounded-lg bg-white text-slate-900 hover:bg-blue-700 transition-all hover:scale-110"
+            <button
+              onClick={increaseQty}
+              className="px-2 py-1.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm"
             >
-              <Minus />
-            </Button>
+              <Plus className="w-3 h-3" />
+            </button>
           </div>
           <Button
             size="icon"
-            className="p-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all hover:scale-110"
+            className="w-8 h-8 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all hover:scale-110 shrink-0"
           >
-            <ShoppingCart className="w-5 h-5" />
+            <ShoppingCart className="w-4 h-4" />
           </Button>
         </div>
       </div>
 
       {/* Stock Status */}
       {product.stock !== undefined && (
-        <div className="mt-3">
+        <div className="mt-2">
           {product.stock > 10 ? (
-            <span className="text-xs text-green-600 dark:text-green-400">
-              In Stock
+            <span className="text-[11px] text-green-600 dark:text-green-400 font-medium">
+              ● In Stock
             </span>
           ) : product.stock > 0 ? (
-            <span className="text-xs text-orange-600 dark:text-orange-400">
-              Only {product.stock} left
+            <span className="text-[11px] text-orange-500 dark:text-orange-400 font-medium">
+              ● Only {product.stock} left
             </span>
           ) : (
-            <span className="text-xs text-red-600 dark:text-red-400">
-              Out of Stock
+            <span className="text-[11px] text-red-500 dark:text-red-400 font-medium">
+              ● Out of Stock
             </span>
           )}
         </div>

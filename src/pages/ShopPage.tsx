@@ -1,118 +1,94 @@
-import { useQuery } from "@tanstack/react-query";
-import { getProduct } from "@/api/products";
-import ProductCard from "@/components/Productcard";
+import { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInView } from "react-intersection-observer";
 
-const dummy = [
-  {
-    name: "Product 1",
-    description: "Description 1",
-    price: 100,
-    image:
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    badge: "New",
-    rating: 4.5,
-    reviews: 10,
-    stock: 10,
-    originalPrice: 150,
-  },
-  {
-    name: "Product 2",
-    description: "Description 2",
-    price: 200,
-    image:
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    badge: "New",
-    rating: 4.5,
-    reviews: 10,
-    stock: 10,
-    originalPrice: 250,
-  },
-  {
-    name: "Product 3",
-    description: "Description 3",
-    price: 300,
-    image:
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    badge: "New",
-    rating: 4.5,
-    reviews: 10,
-    stock: 10,
-    originalPrice: 350,
-  },
-  {
-    name: "Product 4",
-    description: "Description 4",
-    price: 400,
-    image:
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    badge: "New",
-    rating: 4.5,
-    reviews: 10,
-    stock: 10,
-    originalPrice: 450,
-  },
-  {
-    name: "Product 5",
-    description: "Description 5",
-    price: 500,
-    image:
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    badge: "New",
-    rating: 4.5,
-    reviews: 10,
-    stock: 10,
-    originalPrice: 550,
-  },
-  {
-    name: "Product 6",
-    description: "Description 6",
-    price: 600,
-    image:
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    badge: "New",
-    rating: 4.5,
-    reviews: 10,
-    stock: 10,
-    originalPrice: 650,
-  },
-  {
-    name: "Product 7",
-    description: "Description 7",
-    price: 700,
-    image:
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    badge: "New",
-    rating: 4.5,
-    reviews: 10,
-    stock: 10,
-    originalPrice: 750,
-  },
-  {
-    name: "Product 8",
-    description: "Description 8",
-    price: 800,
-    image:
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    badge: "New",
-    rating: 4.5,
-    reviews: 10,
-    stock: 10,
-    originalPrice: 850,
-  },
-];
+import ProductCard from "@/components/Productcard";
+import { searchProduct } from "@/api/products";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function ShopPage() {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["product"],
-    queryFn: getProduct,
-  });
-  console.log("data", data);
+  const [searchParams] = useSearchParams();
+  const keyword = searchParams.get("keyword") ?? "";
+
+  const { ref: loadMoreRef, inView } = useInView();
+  const { data, isLoading, fetchNextPage, isFetchingNextPage, hasNextPage } =
+    useInfiniteQuery({
+      queryKey: ["productList", keyword],
+      queryFn: ({ pageParam = 1 }) => searchProduct(keyword, 10, pageParam),
+      initialPageParam: 1,
+      getNextPageParam: (lastPage: any, allPages: any[]) => {
+        const items: any[] = lastPage.data ?? [];
+        return items.length === 10 ? allPages.length + 1 : undefined;
+      },
+    });
+
+  useEffect(() => {
+    if (inView && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [fetchNextPage, inView, hasNextPage]);
+
+  const allProducts = data?.pages.flatMap((page: any) => page.data ?? []) ?? [];
+
   return (
-    <div className="p-8 mt-10">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {dummy.map((product) => (
-          <ProductCard key={product.name} product={product} />
-        ))}
+    <div className="p-8 mt-16">
+      {/* Header */}
+      <div className="mb-6">
+        {keyword && (
+          <p className="text-slate-500 dark:text-slate-400 text-sm">
+            Showing results for{" "}
+            <span className="font-semibold text-slate-900 dark:text-slate-100">
+              "{keyword}"
+            </span>
+            {!isLoading && (
+              <span className="ml-2 text-slate-400">({allProducts.length}+ results)</span>
+            )}
+          </p>
+        )}
+      </div>
+
+      {/* Loading skeleton */}
+      {isLoading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[...Array(8)].map((_, i) => (
+            <div
+              key={i}
+              className="bg-white dark:bg-slate-800 rounded-xl p-4 animate-pulse"
+            >
+              <div className="aspect-square rounded-lg bg-slate-200 dark:bg-slate-700 mb-4" />
+              <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/3 mb-2" />
+              <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4 mb-2" />
+              <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-full mb-1" />
+              <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-2/3" />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Products grid */}
+      {!isLoading && allProducts.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-24 text-slate-400">
+          <span className="text-5xl mb-4">🔍</span>
+          <p className="text-lg font-medium">No products found</p>
+          <p className="text-sm">Try a different keyword</p>
+        </div>
+      )}
+
+      {!isLoading && allProducts.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {allProducts.map((product: any) => (
+            <ProductCard key={product._id} product={product} />
+          ))}
+        </div>
+      )}
+
+      {/* Infinite scroll trigger */}
+      <div ref={loadMoreRef} className="flex justify-center py-10 w-full">
+        {isFetchingNextPage && <Spinner />}
+        {!isFetchingNextPage && !hasNextPage && allProducts.length > 0 && (
+          <p className="text-slate-400 text-sm">You've reached the end!</p>
+        )}
       </div>
     </div>
   );

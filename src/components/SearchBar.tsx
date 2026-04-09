@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 import { Input } from "./ui/input";
@@ -9,6 +10,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 export default function SearchBar() {
   const [searchInput, setSearchInput] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const keyword = useDebounce(searchInput, 500);
@@ -19,8 +21,13 @@ export default function SearchBar() {
     enabled: keyword.length >= 2,
   });
 
+  function handleSearch() {
+    navigate(`/shop/search?keyword=${searchInput}`);
+  }
+
   const suggestions: { title: string }[] = suggestionsRes?.data ?? [];
-  const showDropdown = isOpen && keyword.length >= 2 && (isFetching || suggestions.length > 0);
+  const showDropdown =
+    isOpen && keyword.length >= 2 && (isFetching || suggestions.length > 0);
 
   return (
     <div
@@ -43,6 +50,11 @@ export default function SearchBar() {
           }}
           onFocus={() => setIsOpen(true)}
           onBlur={() => setTimeout(() => setIsOpen(false), 150)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSearch();
+            }
+          }}
         />
       </div>
 
@@ -63,6 +75,7 @@ export default function SearchBar() {
                   onMouseDown={() => {
                     setSearchInput(item.title);
                     setIsOpen(false);
+                    handleSearch();
                   }}
                 >
                   <Search size={13} className="text-slate-400 shrink-0" />

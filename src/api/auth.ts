@@ -18,4 +18,6 @@ export async function logout() {
   const response = await baseUrl.post("/auth/logout");
   return response.data;
 }
-
+
+
+

@@ -51,7 +51,7 @@ export default function LoginPage({
   });
 
   function handleGoogleAuth() {
-    window.location.href = import.meta.env.BACKEND_URL + "/api/auth/google";
+    window.location.href = 'https://ecom-backend-sqc7.onrender.com' + "/api/auth/google";
   }
 
   function handleLogin(e: React.FormEvent<HTMLFormElement>) {

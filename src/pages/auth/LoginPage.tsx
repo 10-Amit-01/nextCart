@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { useMutation } from "@tanstack/react-query";
 import { login } from "@/api/auth";
 import { Spinner } from "@/components/ui/spinner";
+import { AxiosError } from "axios";
 
 export default function LoginPage({
   className,
@@ -28,7 +29,11 @@ export default function LoginPage({
 }: React.ComponentProps<"div">) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { mutate: loginFn, isPending } = useMutation({
+  const {
+    mutate: loginFn,
+    isPending,
+    error,
+  } = useMutation({
     mutationKey: ["login"],
     mutationFn: ({
       username,
@@ -38,12 +43,18 @@ export default function LoginPage({
       password: string;
     }) => login(username, password),
     onSuccess: (response) => {
-      const token = response.data.accessToken;
-      const user = response.data.user || "User";
+      console.log("response", response);
+
+      const token = response.accessToken;
+      const user = response.user;
       dispatch(authLogin({ token: token, user: user }));
       navigate("/");
     },
   });
+
+  function handleGoogleAuth() {
+    window.location.href = "http://localhost:3000/api/auth/google";
+  }
 
   function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -75,7 +86,15 @@ export default function LoginPage({
                       name="email"
                       placeholder="m@example.com"
                       required
+                      className={`${error ? "border-red-500" : ""}`}
                     />
+                    {error && (
+                      <FieldDescription className="text-red-500">
+                        {error instanceof AxiosError
+                          ? error.response?.data?.message
+                          : error.message}
+                      </FieldDescription>
+                    )}
                   </Field>
                   <Field>
                     <div className="flex items-center">
@@ -92,13 +111,25 @@ export default function LoginPage({
                       name="password"
                       type="password"
                       required
+                      className={`${error ? "border-red-500" : ""}`}
                     />
+                    {error && (
+                      <FieldDescription className="text-red-500">
+                        {error instanceof AxiosError
+                          ? error.response?.data?.message
+                          : error.message}
+                      </FieldDescription>
+                    )}
                   </Field>
                   <Field>
                     <Button type="submit">
                       {isPending ? <Spinner /> : "Login"}
                     </Button>
-                    <Button variant="outline" type="button">
+                    <Button
+                      variant="outline"
+                      type="button"
+                      onClick={handleGoogleAuth}
+                    >
                       Login with Google
                     </Button>
                     <FieldDescription className="text-center">

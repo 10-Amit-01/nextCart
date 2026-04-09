@@ -1,11 +1,13 @@
+import { useMutation } from "@tanstack/react-query";
 import { NavLink, useNavigate } from "react-router-dom";
+import { Moon, Sun } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import SearchBar from "../SearchBar";
+import SearchBar from "@/components/SearchBar";
+import { logout } from "@/api/auth";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { logout } from "@/store/slices/authSlice";
+import { logout as logoutAction } from "@/store/slices/authSlice";
 import { toggleTheme } from "@/store/slices/themeSlice";
-import { Moon, Sun } from "lucide-react";
 
 export default function Header() {
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
@@ -13,10 +15,16 @@ export default function Header() {
   const theme = useAppSelector((state) => state.theme.theme);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { mutateAsync: logoutMutation, isPending } = useMutation({
+    mutationKey: ["logout"],
+    mutationFn: () => logout(),
+    onSuccess: () => {
+      dispatch(logoutAction());
+    },
+  });
 
   const handleLogout = () => {
-    dispatch(logout());
-    navigate("/login");
+    logoutMutation();
   };
 
   return (
@@ -61,7 +69,11 @@ export default function Header() {
             onClick={() => dispatch(toggleTheme())}
             aria-label="Toggle theme"
           >
-            {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            {theme === "dark" ? (
+              <Sun className="w-5 h-5" />
+            ) : (
+              <Moon className="w-5 h-5" />
+            )}
           </Button>
 
           {isLoggedIn ? (
@@ -69,7 +81,15 @@ export default function Header() {
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-semibold">
-                  {user?.name?.charAt(0).toUpperCase() ?? "U"}
+                  {user?.image ? (
+                    <img
+                      src={user.image}
+                      alt=""
+                      className="w-full h-full object-cove rounded-full"
+                    />
+                  ) : (
+                    (user?.name?.charAt(0).toUpperCase() ?? "U")
+                  )}
                 </div>
                 <span className="hidden sm:block text-sm font-medium text-slate-700 dark:text-slate-300">
                   {user?.name ?? "Account"}
@@ -88,7 +108,7 @@ export default function Header() {
                 className="text-sm border-slate-300 dark:border-slate-600 hover:border-blue-500 hover:text-blue-600 transition-colors"
                 onClick={handleLogout}
               >
-                Logout
+                {isPending ? "Logging out..." : "Logout"}
               </Button>
             </div>
           ) : (

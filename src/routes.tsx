@@ -10,6 +10,7 @@ import LoginPage from "./pages/auth/LoginPage";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { SignupForm } from "./pages/auth/SignUp";
+import GoogleCallback from "./pages/auth/GoogleCallback";
 
 const routes = createBrowserRouter([
   {
@@ -51,6 +52,10 @@ const routes = createBrowserRouter([
   {
     path: "/signup",
     element: <SignupForm />,
+  },
+  {
+    path: "/google/callback",
+    element: <GoogleCallback />,
   },
 ]);
 

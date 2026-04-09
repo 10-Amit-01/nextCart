@@ -25,13 +25,12 @@ import { useState } from "react";
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   const navigate = useNavigate();
-  const [passwordError, setPasswordError] = useState(null);
-  const [emailError, setEmailError] = useState(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
   const dispatch = useAppDispatch();
   const {
     mutate: signUp,
     isPending,
-    error,
   } = useMutation({
     mutationKey: ["signUp"],
     mutationFn: ({

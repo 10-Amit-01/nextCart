@@ -1,10 +1,10 @@
 import axios from "axios";
 
 const baseUrl = axios.create({
-  baseURL: "http://localhost:3000/api",
+  baseURL: "https://ecom-backend-sqc7.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
-    
+    withCredentials: true
   },
 });
 

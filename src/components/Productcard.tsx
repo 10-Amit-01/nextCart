@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart, Heart, Plus, Minus } from "lucide-react";
 import { useState } from "react";
 
-export default function ProductCard({ product, className = "" }) {
+export default function ProductCard({ product, className = "" }: { product: any; className?: string }) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [qty, setQty] = useState(1);
 

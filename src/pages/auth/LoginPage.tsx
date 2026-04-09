@@ -43,8 +43,6 @@ export default function LoginPage({
       password: string;
     }) => login(username, password),
     onSuccess: (response) => {
-      console.log("response", response);
-
       const token = response.accessToken;
       const user = response.user;
       dispatch(authLogin({ token: token, user: user }));
@@ -53,7 +51,7 @@ export default function LoginPage({
   });
 
   function handleGoogleAuth() {
-    window.location.href = "http://localhost:3000/api/auth/google";
+    window.location.href = import.meta.env.BACKEND_URL + "/api/auth/google";
   }
 
   function handleLogin(e: React.FormEvent<HTMLFormElement>) {

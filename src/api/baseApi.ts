@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const baseUrl = axios.create({
-  baseURL: 'https://ecom-backend-sqc7.onrender.com/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
   headers: {
     "Content-Type": "application/json",
     withCredentials: true

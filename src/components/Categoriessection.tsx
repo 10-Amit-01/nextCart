@@ -1,25 +1,26 @@
 import { ArrowRight } from "lucide-react";
+import { NavLink } from "react-router-dom";
 
 const categories = [
   {
     id: 1,
-    title: "Audio",
+    title: "Shoes",
     subtitle: "Professional Sound Systems",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDTv0JsM7X1btz2LLKRiDcUOPKttIfvZ3mNUq9HANUt3hqIKp4kel0bx0W9WT9idHl3TfPch3dIAjE-e-kUPcilR0aVjCD-L5w-j2Rw-VZFaknVe7LTujOVhi1GiLK3-pw87VWEfZ_VcyPVA4VptZPb4O-iKQcrzKglwUC8BHGfE2NLmHcV7jLkO-EjK265XX4EdQaxtB6-G2vRRPoO1OL9vhuwKN7xUnVRMPEXZ2XSpAjfbbmvb6wX4puh7mCmhXkUCH4DCA9gl5Ow",
+    image: "https://cdn.pixabay.com/photo/2016/11/19/18/06/feet-1840619_1280.jpg",
     alt: "Minimalist desktop setup with high-end bookshelf speakers",
   },
   {
     id: 2,
-    title: "Computing",
+    title: "Phones",
     subtitle: "High Performance Workstations",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDg5dUFCC6vrA_zm233K4e9p4tB2qvmTAZQbYeUbTHjMD-nRZxBUmcjMUXZ3ixyyIouw0apbWZwCziW_ndfVdEU-giRnOZTH2Ho--hX10dMfUQ2g0E0UAfrjT-ytH_0zTlyMmHgYY7wOKKXzSk3I4e4YONHWPYMabxDpVtX4tqeb2PC-Uf48hdt1SpEt8kNqM2e0Tb2NtXpifnswyvDqeNG1JyMwRMokM-s-GE5CqqOaSlIYLo1NfST0uiiID3JldQV0Go_rvuxDuNn",
+    image: "https://cdn.pixabay.com/photo/2016/11/29/12/30/phone-1869510_1280.jpg",
     alt: "Modern ultra-slim silver laptop on a clean wooden desk",
   },
   {
     id: 3,
-    title: "Smart Home",
+    title: "Home Accessories",
     subtitle: "Seamless Living Solutions",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAkR0iNbWqgTY496yFUb9dxo8TbBVWVSHgxKfYZR3Ya7SZk8iSUpn1w5MTBYZtw7O_8zof_dEDV7l833SKt6UwaCOn2_BWOEzhbFAgGtxfbc-KjOzF1LZY6ZSQfcPrbLoCwEtLtcB3hr7mi04RWW0giw5YT7rByod-uobGSA3vSHekX-N_Dv4Vw5pyMDPt9FI0BTSa2t9DH606K35ilmbJAMxIcYC-zz3dXlqSK4ooyk-_KNlKuEzGo3EQoVLt2Q8wP0vpwxS-PW_5I",
+    image: "https://plus.unsplash.com/premium_photo-1670360414946-e33a828d1d52?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aG9tZSUyMGRlY29yfGVufDB8fDB8fHww",
     alt: "Smart home control panel in a modern living room",
   },
 ];
@@ -50,7 +51,8 @@ export default function CategoriesSection() {
       {/* Categories Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {categories.map((category) => (
-          <div 
+          <NavLink
+            to={`/shop/search?keyword=${category.title}`} 
             key={category.id}
             className="group relative overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-800 h-96 cursor-pointer"
           >
@@ -73,7 +75,7 @@ export default function CategoriesSection() {
                 {category.subtitle}
               </p>
             </div>
-          </div>
+          </NavLink>
         ))}
       </div>
     </section>

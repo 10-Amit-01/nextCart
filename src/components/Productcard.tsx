@@ -1,10 +1,16 @@
+import { useNavigate } from "react-router-dom";
+
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Heart, Plus, Minus } from "lucide-react";
 import { useState } from "react";
+import { useAppDispatch } from "@/store/hooks";
+import { addToCart } from "@/store/slices/cartSlice";
 
 export default function ProductCard({ product, className = "" }: { product: any; className?: string }) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [qty, setQty] = useState(1);
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   function increaseQty() {
     if (qty === product.stock) return;
@@ -31,6 +37,7 @@ export default function ProductCard({ product, className = "" }: { product: any;
         flex flex-col
         ${className}
       `}
+      onClick={() => navigate(`/product/${product._id}`)}
     >
       {/* Product Image */}
       <div className="aspect-square rounded-lg bg-slate-100 dark:bg-slate-700 overflow-hidden mb-4 relative">
@@ -190,6 +197,16 @@ export default function ProductCard({ product, className = "" }: { product: any;
           <Button
             size="icon"
             className="w-8 h-8 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all hover:scale-110 shrink-0"
+            onClick={(e) => {
+              e.stopPropagation();
+              dispatch(addToCart({
+                _id: product._id,
+                title: product.title,
+                price: product.discountPrice ?? product.price,
+                image: product.images?.[0]?.url || "https://placehold.co/400x400?text=No+Image",
+                quantity: qty
+              }));
+            }}
           >
             <ShoppingCart className="w-4 h-4" />
           </Button>

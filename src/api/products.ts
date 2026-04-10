@@ -17,3 +17,13 @@ export async function searchProduct(
   );
   return response;
 }
+
+export async function getProductById(id: string) {
+  const response = await baseUrl.get(`/products/${id}`);
+  return response;
+}
+
+export async function getTrendingProducts() {
+  const response = await baseUrl.get(`/products/trending`);
+  return response;
+}

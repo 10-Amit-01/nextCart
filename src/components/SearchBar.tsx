@@ -22,7 +22,10 @@ export default function SearchBar() {
   });
 
   function handleSearch() {
-    navigate(`/shop/search?keyword=${searchInput}`);
+    if (searchInput.trim()) {
+      navigate(`/shop/search?keyword=${searchInput}`);
+      setIsOpen(false);
+    }
   }
 
   const suggestions: { title: string }[] = suggestionsRes?.data ?? [];
@@ -32,7 +35,7 @@ export default function SearchBar() {
   return (
     <div
       ref={containerRef}
-      className="hidden lg:flex flex-col relative items-start bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-lg gap-0 w-72"
+      className="flex flex-col relative items-start bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-lg gap-0 w-full lg:w-72"
     >
       {/* Search input row */}
       <div className="flex items-center gap-3 w-full">
@@ -67,7 +70,7 @@ export default function SearchBar() {
               Searching...
             </div>
           ) : (
-            <ul>
+            <ul className="max-h-60 overflow-y-auto">
               {suggestions.map((item, index) => (
                 <li
                   key={index}
@@ -75,7 +78,7 @@ export default function SearchBar() {
                   onMouseDown={() => {
                     setSearchInput(item.title);
                     setIsOpen(false);
-                    handleSearch();
+                    navigate(`/shop/search?keyword=${item.title}`);
                   }}
                 >
                   <Search size={13} className="text-slate-400 shrink-0" />

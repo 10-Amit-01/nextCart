@@ -3,14 +3,21 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Heart, Plus, Minus } from "lucide-react";
 import { useState } from "react";
-import { useAppDispatch } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addToCart } from "@/store/slices/cartSlice";
 
-export default function ProductCard({ product, className = "" }: { product: any; className?: string }) {
+export default function ProductCard({
+  product,
+  className = "",
+}: {
+  product: any;
+  className?: string;
+}) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [qty, setQty] = useState(1);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
 
   function increaseQty() {
     if (qty === product.stock) return;
@@ -23,7 +30,9 @@ export default function ProductCard({ product, className = "" }: { product: any;
   }
 
   const discountPct = product.discountPrice
-    ? Math.round(((product.price - product.discountPrice) / product.price) * 100)
+    ? Math.round(
+        ((product.price - product.discountPrice) / product.price) * 100,
+      )
     : null;
 
   return (
@@ -81,7 +90,10 @@ export default function ProductCard({ product, className = "" }: { product: any;
             ${isWishlisted ? "text-red-500" : "text-slate-400"}
           `}
         >
-          <Heart className="w-4 h-4" fill={isWishlisted ? "currentColor" : "none"} />
+          <Heart
+            className="w-4 h-4"
+            fill={isWishlisted ? "currentColor" : "none"}
+          />
         </Button>
 
         {/* Quick View on Hover */}
@@ -132,7 +144,9 @@ export default function ProductCard({ product, className = "" }: { product: any;
             </div>
             <span className="text-xs text-slate-500 dark:text-slate-400">
               {product.rating.toFixed(1)}{" "}
-              <span className="text-slate-400">({product.numReviews?.toLocaleString()})</span>
+              <span className="text-slate-400">
+                ({product.numReviews?.toLocaleString()})
+              </span>
             </span>
           </div>
         )}
@@ -199,13 +213,21 @@ export default function ProductCard({ product, className = "" }: { product: any;
             className="w-8 h-8 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all hover:scale-110 shrink-0"
             onClick={(e) => {
               e.stopPropagation();
-              dispatch(addToCart({
-                _id: product._id,
-                title: product.title,
-                price: product.discountPrice ?? product.price,
-                image: product.images?.[0]?.url || "https://placehold.co/400x400?text=No+Image",
-                quantity: qty
-              }));
+              if (isLoggedIn) {
+                dispatch(
+                  addToCart({
+                    _id: product._id,
+                    title: product.title,
+                    price: product.discountPrice ?? product.price,
+                    image:
+                      product.images?.[0]?.url ||
+                      "https://placehold.co/400x400?text=No+Image",
+                    quantity: qty,
+                  }),
+                );
+              } else {
+                navigate("/login");
+              }
             }}
           >
             <ShoppingCart className="w-4 h-4" />

@@ -1,10 +1,10 @@
 import axios from "axios";
 
 const baseUrl = axios.create({
-  baseURL: import.meta.env.BASE_URL || 'http://localhost:3000/api',
+  baseURL: "https://ecom-backend-sqc7.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
-    withCredentials: true
+    withCredentials: true,
   },
 });
 
@@ -19,7 +19,10 @@ baseUrl.interceptors.request.use((config) => {
 baseUrl.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response.status === 401 && error.response.data.message === "Unauthorized") { 
+    if (
+      error.response.status === 401 &&
+      error.response.data.message === "Unauthorized"
+    ) {
       const token = localStorage.getItem("token");
       if (token) {
         const response = await baseUrl.post("/auth/refreshToken", { token });
